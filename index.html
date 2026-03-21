@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Forge 20 - Ferramentas T20</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="main-header">
+            <h1>MACRO FORGE 20</h1>
+            <p>Gerador de Macros para Roll20 - Sistema T20</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" id="btn-tab-pericia" onclick="openTab('pericia')">⚔️ Perícia</button>
+            <button class="tab-btn" id="btn-tab-combate" onclick="openTab('combate')">🛡️ Combate</button>
+            <button class="tab-btn" id="btn-tab-seletor" onclick="openTab('seletor')">⚙️ Seletor</button>
+        </nav>
+
+        <section class="global-info">
+            <div class="input-row">
+                <div class="input-group" style="flex: 2;">
+                    <label>Nome do Personagem</label>
+                    <input type="text" id="charName" placeholder="Nome do Personagem no Roll20" oninput="updateAll()">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>Margem Crítico</label>
+                    <input type="number" id="critMargin" value="20" min="1" max="20" oninput="updateAll()">
+                </div>
+            </div>
+            <details class="collapsible">
+                <summary>🎲 Modificador de Dado Global</summary>
+                <div class="details-content radio-group">
+                    <label class="radio-option"><input type="radio" name="diceMod" id="rollNormal" checked
+                            onchange="updateAll()"> Normal</label>
+                    <label class="radio-option"><input type="radio" name="diceMod" id="rollVantagem"
+                            onchange="updateAll()"> Vantagem</label>
+                    <label class="radio-option"><input type="radio" name="diceMod" id="rollDesvantagem"
+                            onchange="updateAll()"> Desvantagem</label>
+                </div>
+            </details>
+        </section>
+
+        <div id="pericia" class="tab-content active">
+            <div class="input-group">
+                <label>Nome da Perícia</label>
+                <input type="text" id="skillName" placeholder="Ex: Reflexos" oninput="updateAll()">
+            </div>
+            <details class="collapsible">
+                <summary>🖼️ Imagens de Reação</summary>
+                <div class="details-content">
+                    <div class="media-item"><input type="checkbox" id="checkCrit" onchange="updateAll()"><input
+                            type="text" id="urlCrit" placeholder="URL do GIF/Imagem Crítico" oninput="updateAll()">
+                    </div>
+                    <div class="media-item"><input type="checkbox" id="checkNormal" onchange="updateAll()"><input
+                            type="text" id="urlNormal" placeholder="URL do GIF/Imagem Normal" oninput="updateAll()">
+                    </div>
+                    <div class="media-item"><input type="checkbox" id="checkFail" onchange="updateAll()"><input
+                            type="text" id="urlFail" placeholder="URL do GIF/Imagem Falha" oninput="updateAll()"></div>
+                </div>
+            </details>
+            <div class="output-box">
+                <textarea id="output" class="macro-output" readonly></textarea>
+                <button class="btn-copy" onclick="copyAndLog('output', 'Perícia')">Copiar e Salvar no Log</button>
+            </div>
+        </div>
+
+        <div id="combate" class="tab-content">
+            <div class="input-group">
+                <label>Arma / Ataque</label>
+                <input type="text" id="atkWeapon" placeholder="Ex: Machadinha(Corte)" oninput="updateAll()">
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label>Dano Base</label><input type="text" id="atkDmgDice" placeholder="1d6"
+                        oninput="updateAll()"></div>
+                <div class="input-group"><label>Crítico (x)</label><input type="number" id="atkCritMult" value="3"
+                        oninput="updateAll()"></div>
+                <div class="input-group"><label>Dano Extra (não comece com "+")</label><input type="text"
+                        id="atkExtraDmg" placeholder="Ex: 2 / 1d6 / 1d6+2" oninput="updateAll()"></div>
+            </div>
+
+            <label style="margin-top:15px;">Selecione os Atributos (Dano)</label>
+            <div class="attribute-grid">
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="for_mod"
+                        onchange="updateAll()"> FOR</label>
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="des_mod"
+                        onchange="updateAll()"> DES</label>
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="con_mod"
+                        onchange="updateAll()"> CON</label>
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="int_mod"
+                        onchange="updateAll()"> INT</label>
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="wis_mod"
+                        onchange="updateAll()"> SAB</label>
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="cha_mod"
+                        onchange="updateAll()"> CAR</label>
+            </div>
+
+            <details class="collapsible">
+                <summary>🖼️ Imagens de Reação de Combate</summary>
+                <div class="details-content">
+                    <div class="media-item"><input type="checkbox" id="checkAtkCrit" onchange="updateAll()"><input
+                            type="text" id="urlAtkCrit" placeholder="URL do GIF/Imagem Crítico" oninput="updateAll()">
+                    </div>
+                    <div class="media-item"><input type="checkbox" id="checkAtkNorm" onchange="updateAll()"><input
+                            type="text" id="urlAtkNorm" placeholder="URL do GIF/Imagem Normal" oninput="updateAll()">
+                    </div>
+                    <div class="media-item"><input type="checkbox" id="checkAtkFail" onchange="updateAll()"><input
+                            type="text" id="urlAtkFail" placeholder="URL do GIF/Imagem Falha Crítica"
+                            oninput="updateAll()">
+                    </div>
+                </div>
+            </details>
+            <div class="output-box">
+                <textarea id="outputCombate" class="macro-output" readonly></textarea>
+                <button class="btn-copy" onclick="copyAndLog('outputCombate', 'Combate')">Copiar e Salvar no
+                    Log</button>
+            </div>
+        </div>
+
+        <div id="seletor" class="tab-content">
+            <div class="input-row">
+                <div class="input-group" style="flex: 2;">
+                    <label>Título do Menu</label>
+                    <input type="text" id="queryTitle" value="Selecione o teste" oninput="updateAll()">
+                </div>
+                <div class="input-group" style="flex: 1;">
+                    <label>CD (Opcional)</label>
+                    <input type="text" id="querySelectorCD" placeholder="Ex: 15" oninput="updateAll()">
+                </div>
+            </div>
+
+            <div class="add-btn-row">
+                <input type="text" id="btnLabel" placeholder="Nova Opção" onkeypress="handleEnter(event)">
+                <button class="btn-add" onclick="addButton()">ADICIONAR</button>
+            </div>
+            <div id="buttonContainer"></div>
+
+            <details class="collapsible">
+                <summary>🖼️ Imagem do Seletor</summary>
+                <div class="details-content">
+                    <div class="media-item">
+                        <input type="checkbox" id="checkSelectorGif" onchange="updateAll()">
+                        <input type="text" id="urlSelectorGif" placeholder="URL do GIF/Imagem" oninput="updateAll()">
+                    </div>
+                </div>
+            </details>
+
+            <div class="output-box">
+                <textarea id="outputSelector" class="macro-output" readonly></textarea>
+                <button class="btn-copy" onclick="copyAndLog('outputSelector', 'Seletor')">Copiar e Salvar no
+                    Log</button>
+            </div>
+        </div>
+
+        <section class="preview-section">
+            <span class="section-title">Visualização Prévia (Roll20 Style)</span>
+            <div id="roll20-preview" class="r20-card">
+                <div class="r20-header" id="pre-header">Personagem</div>
+                <div class="r20-body">
+                    <div id="pre-skill" style="font-style: italic; color: #777;">Perícia</div>
+                    <div class="r20-roll">20</div>
+                    <div id="pre-gif-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="log-section">
+            <span class="section-title">Log de Macros Recentes</span>
+            <div id="macroLog" class="log-container">
+                <p style="font-size: 0.75rem; color: #888;">Nenhuma macro no log ainda...</p>
+            </div>
+        </section>
+
+        <button class="btn-clear" onclick="clearAllData()">Limpar tudo</button>
+
+        <!-- ASSINATURA / CRÉDITOS (STR-style) -->
+        <section class="sig-wrap" aria-label="Sobre e créditos">
+            <details class="sig-card">
+                <summary class="sig-summary">
+                    <div class="sig-summary-left">
+                        <span class="sig-badge">Sobre</span>
+                        <span class="sig-title">Créditos e outros projetos</span>
+                    </div>
+                    <div class="sig-summary-right">
+                        <span class="sig-hint">clique para abrir</span>
+                        <span class="sig-chevron" aria-hidden="true">▾</span>
+                    </div>
+                </summary>
+
+                <div class="sig-body">
+                    <div class="sig-hero">
+                        <h3 class="sig-h3">Quem fez isso?</h3>
+                        <p class="sig-p">
+                            Olá! Meu nome é <strong>Nicholas Lemos</strong>.
+                            Sou jogador de RPG, desenvolvedor de software e entusiasta de ferramentas para
+                            <strong>Tormenta20</strong>.
+                        </p>
+                        <p class="sig-p">
+                            Criei este <strong>Gerador de Macros</strong> para facilitar jogadores do roll20. Basta
+                            preencher e colocar na aba Coleção > Macros >Adicionar.
+                        </p>
+                        <p class="sig-p">
+                            Feedbacks, sugestões e ideias são sempre bem-vindos.
+                        </p>
+                    </div>
+                    <div class="sig-col">
+                        <h4 class="sig-h4">Contato</h4>
+
+                        <a class="sig-link"
+                            href="https://api.whatsapp.com/send/?phone=5531992825753&text=Ol%C3%A1%2C+gostaria+de+tirar+uma+d%C3%BAvida.&type=phone_number&app_absent=0"
+                            target="_blank" rel="noopener noreferrer">
+                            <div class="sig-link-main">
+                                <span class="sig-link-name">WhatsApp</span>
+                                <span class="sig-link-url">Fale comigo diretamente</span>
+                            </div>
+                            <span class="sig-ext">↗</span>
+                        </a>
+
+                        <a class="sig-link" href="https://www.linkedin.com/in/nicholas-lemos/" target="_blank"
+                            rel="noopener noreferrer">
+                            <div class="sig-link-main">
+                                <span class="sig-link-name">LinkedIn</span>
+                                <span class="sig-link-url">Perfil profissional</span>
+                            </div>
+                            <span class="sig-ext">↗</span>
+                        </a>
+
+                        <a class="sig-link" href="https://github.com/nicholemos" target="_blank"
+                            rel="noopener noreferrer">
+                            <div class="sig-link-main">
+                                <span class="sig-link-name">GitHub</span>
+                                <span class="sig-link-url">Repositórios e projetos</span>
+                            </div>
+                            <span class="sig-ext">↗</span>
+                        </a>
+
+                        <div class="sig-note sig-cta">
+                            <div class="sig-note-title">Que tal um site para você?</div>
+                            <div class="sig-note-text">
+                                Dê uma olhada no modelo de site e me chame para conversarmos.
+                                <br>
+                                <a href="https://nicholemos.github.io/" target="_blank" rel="noopener noreferrer">
+                                    https://nicholemos.github.io/
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="sig-grid">
+                        <div class="sig-col">
+                            <h4 class="sig-h4">Conheça meus outros projetos</h4>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/STR" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">STR – Supremo Tribunal Regreiro</span>
+                                    <span class="sig-link-url">nicholemos.github.io/STR</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/ficha/" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Ficha Automática de Tormenta20</span>
+                                    <span class="sig-link-url">nicholemos.github.io/ficha</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/itens/" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Compilado de Itens</span>
+                                    <span class="sig-link-url">nicholemos.github.io/itens</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/poderes/" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Compilado de Poderes</span>
+                                    <span class="sig-link-url">nicholemos.github.io/poderes</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/CalculadoradeAtributos/"
+                                target="_blank" rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Calculadora de Atributos</span>
+                                    <span class="sig-link-url">nicholemos.github.io/CalculadoradeAtributos</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/EncontrosAleatorios/" target="_blank"
+                                rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Encontros Aleatórios</span>
+                                    <span class="sig-link-url">nicholemos.github.io/EncontrosAleatorios</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <a class="sig-link" href="https://nicholemos.github.io/calculadoraND_Tormenta/"
+                                target="_blank" rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Calculadora de ND</span>
+                                    <span class="sig-link-url">nicholemos.github.io/calculadoraND_Tormenta</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+                        </div>
+
+                        <div class="sig-col">
+                            <h4 class="sig-h4">Este projeto</h4>
+
+                            <a class="sig-link sig-link-primary" href="https://nicholemos.github.io/combate/"
+                                target="_blank" rel="noopener noreferrer">
+                                <div class="sig-link-main">
+                                    <span class="sig-link-name">Gerenciador de Combate – Tormenta20</span>
+                                    <span class="sig-link-url">nicholemos.github.io/combate</span>
+                                </div>
+                                <span class="sig-ext" aria-hidden="true">↗</span>
+                            </a>
+
+                            <div class="sig-note">
+                                <div class="sig-note-title">Dica rápida</div>
+                                <div class="sig-note-text">
+                                    Os links abrem em nova aba. Durante a semana vamos polir cada ferramenta aos poucos.
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="sig-footer">
+                        <span class="sig-footer-text">Feito para mesa rápida. Feedbacks são bem-vindos.</span>
+                    </div>
+                </div>
+            </details>
+        </section>
+    </div>
+
+
+    <script src="script.js"></script>
+
+
+
+</body>
+
+
+</html>
