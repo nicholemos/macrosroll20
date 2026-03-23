@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Macro Forge 2.0</title>
+    <title>Macro Forge 20</title>
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -19,15 +18,15 @@
         <nav class="tabs">
             <button class="tab-btn active" id="btn-tab-pericia" onclick="openTab('pericia')">⚔️ Perícia</button>
             <button class="tab-btn" id="btn-tab-combate" onclick="openTab('combate')">🛡️ Combate</button>
-            <button class="tab-btn" id="btn-tab-seletor" onclick="openTab('seletor')">⚙️ Seletor</button>
+            <button class="tab-btn" id="btn-tab-seletor" onclick="openTab('seletor')">⚙️ Gerar Seletor</button>
             <button class="tab-btn" id="btn-tab-avancado" onclick="openTab('avancado')">✨ Avançado</button>
         </nav>
 
-        <section class="global-info">
+        <section class="global-info" id="globalInfoSection">
             <div class="input-row">
                 <div class="input-group" style="flex: 2;">
                     <label>Nome do Personagem</label>
-                    <input type="text" id="charName" placeholder="Nome do Personagem no Roll20" oninput="updateAll()">
+                    <input type="text" id="charName" placeholder="Nome do Personagem no roll20" oninput="updateAll()">
                 </div>
                 <div class="input-group" style="flex: 1;">
                     <label>Crítico ≥</label>
@@ -39,7 +38,7 @@
                 </div>
             </div>
             <details class="collapsible">
-                <summary>🎲 Modificador de Dado Global</summary>
+                <summary>🎲 Modificador de Dado Global (Vantagem / Desvantagem)</summary>
                 <div class="details-content radio-group">
                     <label class="radio-option"><input type="radio" name="diceMod" id="rollNormal" checked
                             onchange="updateAll()"> Normal</label>
@@ -55,7 +54,7 @@
         <div id="pericia" class="tab-content active">
             <div class="input-group">
                 <label>Nome da Perícia</label>
-                <input type="text" id="skillName" placeholder="Ex: Fortitude" oninput="updateAll()">
+                <input type="text" id="skillName" placeholder="Ex: Reflexos" oninput="updateAll()">
             </div>
             <details class="collapsible">
                 <summary>🖼️ Gifs de Reação</summary>
@@ -78,15 +77,15 @@
         <div id="combate" class="tab-content">
             <div class="input-group">
                 <label>Arma / Ataque</label>
-                <input type="text" id="atkWeapon" placeholder="Ex: Machadinha(Corte)" oninput="updateAll()">
+                <input type="text" id="atkWeapon" placeholder="Ex: Machadinha (Corte)" oninput="updateAll()">
             </div>
             <div class="input-row">
                 <div class="input-group"><label>Dano Base</label><input type="text" id="atkDmgDice" placeholder="1d6"
                         oninput="updateAll()"></div>
                 <div class="input-group"><label>Crítico (x)</label><input type="number" id="atkCritMult" value="3"
                         oninput="updateAll()"></div>
-                <div class="input-group"><label>Dano Extra (não começe com "+")</label><input type="text"
-                        id="atkExtraDmg" placeholder="Ex: 2 ou 1d6 ou 2 + 1d6" oninput="updateAll()"></div>
+                <div class="input-group"><label>Dano Extra</label><input type="text" id="atkExtraDmg"
+                        placeholder="Ex: 2 ou 1d6" oninput="updateAll()"></div>
             </div>
 
             <label style="margin-top:15px;">Selecione os Atributos (Dano)</label>
@@ -162,7 +161,7 @@
             </div>
             <div id="diceGroupsContainer"></div>
             <button class="btn-add" style="width:100%; padding:10px; margin-bottom:15px;" onclick="addDiceGroup()">+
-                ADICIONAR GRUPO DE DADOS</button>
+                ADICIONAR DADOS DIFERENTES</button>
             <div class="input-group">
                 <label>Bônus Fixo</label>
                 <input type="number" id="advBonus" value="0" oninput="updateAll()">
@@ -206,6 +205,7 @@
                 style="margin-top: 25px; background: #e74c3c; color: white; border: 2px dashed #c0392b; width: 100%; padding: 12px; cursor: pointer; font-size: 0.8rem; font-family: 'Tormenta', serif; text-transform: uppercase; font-weight: bold; border-radius: 8px; transition: 0.3s;">
                 ⚠️ Limpar todos os dados salvos
             </button>
+
         </section>
 
         <!-- ASSINATURA / CRÉDITOS (STR-style) -->
@@ -378,10 +378,9 @@
                 </div>
             </details>
         </section>
-
-
     </div>
     <script src="script.js"></script>
+
 
 
 </body>
