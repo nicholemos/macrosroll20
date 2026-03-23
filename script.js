@@ -58,7 +58,7 @@ function renderDiceGroups() {
         // Criamos IDs únicos para os inputs de texto para poder devolver o foco depois
         const inputId = `dg-input-${i}`;
         const signCtrl = i === 0
-            ? '<span class="dg-sign-static">[[</span>'
+            ? '<span class="dg-sign-static">Dados</span>'
             : `<select class="dg-sign-sel" onchange="updateDiceGroup(${i},'sign',this.value)"><option value="+" ${g.sign !== '-' ? 'selected' : ''}>+</option><option value="-" ${g.sign === '-' ? 'selected' : ''}>-</option></select>`;
 
         const removeBtn = diceGroups.length > 1
@@ -88,25 +88,25 @@ function renderDiceGroups() {
         };
 
         return `<div class="dice-group">
-    <div class="dice-group-top">
-        ${signCtrl}
-        <input type="text" id="${inputId}" class="dg-dice-input" placeholder="1d6" value="${g.dice}"
-            oninput="updateDiceGroup(${i},'dice',this.value)">
-        ${removeBtn}
-    </div>
-    <div class="dice-group-mods">
-        ${mod('explode', '!', false)}
-        ${mod('explodeCont', '!!', false)}
-        ${mod('kh', 'kh', true, 'khN')}
-        ${mod('kl', 'kl', true, 'klN')}
-        ${mod('dh', 'dh', true, 'dhN')}
-        ${mod('dl', 'dl', true, 'dlN')}
-        ${mod('r', 'r<', true, 'rN')}
-        ${mod('ro', 'ro<', true, 'roN')}
-        ${mod('f', 'f<', true, 'fN')}
-        ${mod('sort', 's', false)}
-    </div>
-</div>`;
+            <div class="dice-group-top">
+                ${signCtrl}
+                <input type="text" id="${inputId}" class="dg-dice-input" placeholder="1d6" value="${g.dice}"
+                    oninput="updateDiceGroup(${i},'dice',this.value)">
+                ${removeBtn}
+            </div>
+            <div class="dice-group-mods">
+                ${mod('explode', '!', false)}
+                ${mod('explodeCont', '!!', false)}
+                ${mod('kh', 'kh', true, 'khN')}
+                ${mod('kl', 'kl', true, 'klN')}
+                ${mod('dh', 'dh', true, 'dhN')}
+                ${mod('dl', 'dl', true, 'dlN')}
+                ${mod('r', 'r<', true, 'rN')}
+                ${mod('ro', 'ro<', true, 'roN')}
+                ${mod('f', 'f<', true, 'fN')}
+                ${mod('sort', 's', false)}
+            </div>
+        </div>`;
     }).join('');
 
     // Se o elemento que tinha foco ainda existe, devolvemos o foco a ele
@@ -194,6 +194,16 @@ function openTab(tabId) {
     const btn = document.getElementById('btn-tab-' + tabId);
     if (btn) btn.classList.add('active');
 
+    // Controlar visibilidade da seção global-info
+    const globalInfoSection = document.getElementById('globalInfoSection');
+    if (globalInfoSection) {
+        if (tabId === 'seletor' || tabId === 'avancado') {
+            globalInfoSection.style.display = 'none';
+        } else {
+            globalInfoSection.style.display = 'block';
+        }
+    }
+
     localStorage.setItem('forge_lastTab', tabId);
     updateAll();
 }
@@ -239,7 +249,7 @@ function updateAll() {
     let cDmgParts = [];
     for (let i = 0; i < mult; i++) { cDmgParts.push(dd); }
     const cDmg = cDmgParts.join(' + ') + ` + ${attrString} + ${extra}`;
-    document.getElementById('outputCombate').value = `&{template:custom}{{name=@{${name}|character_name}}}{{secondname= *${w}* }}{{rollname=Rolagem }}{{theroll=[[${db}cs>${margin}${cfStr}+[[@{${name}|lutatotal}+@{${name}|condicaomodataque}]]+@{${name}|ataquetemp}]]}} {{criticalname=Dano}}{{ifcritical=[[${cDmg}]] CRITICO \n**Quem decide isso, SOU EU**\n${gAtkCrit}}}{{notcritical=[[${dd}+${attrString}+${extra}+@{${name}|danotemp}+@{${name}|rolltemp}]] ${gAtkNorm}}}{{ifcriticalerror=${gAtkFail}**Oh shit...**}}`;
+    document.getElementById('outputCombate').value = `&{template:custom}{{name=@{${name}|character_name}}}{{secondname= *${w}* }}{{rollname=Rolagem }}{{theroll=[[${db}cs>${margin}${cfStr}+[[@{${name}|lutatotal}+@{${name}|condicaomodataque}]]+@{${name}|ataquetemp}]]}} {{criticalname=Dano}}{{ifcritical=[[${cDmg}]] CRITICO \n${gAtkCrit}}}{{notcritical=[[${dd}+${attrString}+${extra}+@{${name}|danotemp}+@{${name}|rolltemp}]] ${gAtkNorm}}}{{ifcriticalerror=${gAtkFail}}}`;
 
     // --- SELETOR ---
     const st = document.getElementById('queryTitle').value || "Opções";
@@ -362,11 +372,11 @@ function renderLog() {
         return;
     }
     container.innerHTML = macroLog.map((item, index) => `
-        <div class="log-item">
-            <span><strong>[${item.time}]</strong> ${item.label}</span>
-            <button class="btn-log-copy" onclick="copyFromLog(${index})">Copiar</button>
-        </div>
-    `).join('');
+                <div class="log-item">
+                    <span><strong>[${item.time}]</strong> ${item.label}</span>
+                    <button class="btn-log-copy" onclick="copyFromLog(${index})">Copiar</button>
+                </div>
+            `).join('');
     localStorage.setItem('forge_log', JSON.stringify(macroLog));
 }
 
