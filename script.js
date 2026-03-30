@@ -4,6 +4,7 @@
 let selectorButtons = [];
 let macroLog = [];
 let currentDiceOnly = "";
+let simplesFields = []; // [{label, value}]
 
 // ================================================================
 //  DICE GROUPS – state & helpers
@@ -179,6 +180,63 @@ function simulateGroup(g) {
     return { total, detail: parts.join(' '), limitReached: hitLimit };
 }
 
+// ================================================================
+//  MODELO SIMPLES – campos extras dinâmicos
+// ================================================================
+function addSimplesField() {
+    simplesFields.push({ label: '', value: '' });
+    renderSimplesFields();
+    updateAll();
+}
+
+function removeSimplesField(i) {
+    simplesFields.splice(i, 1);
+    renderSimplesFields();
+    updateAll();
+}
+
+function updateSimplesField(i, key, val) {
+    if (!simplesFields[i]) return;
+    simplesFields[i][key] = val;
+    updateAll();
+}
+
+function renderSimplesFields() {
+    const container = document.getElementById('simplesFieldsContainer');
+    if (!container) return;
+
+    if (simplesFields.length === 0) {
+        container.innerHTML = '<div class="simples-empty-hint">Nenhum campo extra. Clique em "+ CAMPO" para adicionar.</div>';
+        return;
+    }
+
+    container.innerHTML = simplesFields.map((f, i) => `
+        <div class="simples-field-row">
+            <input type="text" class="simples-label-input" placeholder="Rótulo (ex: Dano)"
+                value="${f.label}" oninput="updateSimplesField(${i},'label',this.value)">
+            <span class="simples-field-sep">=</span>
+            <input type="text" class="simples-value-input" placeholder="Valor (ex: 6d6)"
+                value="${f.value}" oninput="updateSimplesField(${i},'value',this.value)">
+            <button class="dg-remove-btn" onclick="removeSimplesField(${i})">×</button>
+        </div>
+    `).join('');
+}
+
+function generateSimplesMacro() {
+    const name = (document.getElementById('simplesName')?.value || '').trim() || 'Habilidade';
+    const desc = (document.getElementById('simplesDesc')?.value || '').trim();
+    const gifOn = document.getElementById('checkSimplesGif')?.checked;
+    const gifUrl = document.getElementById('urlSimplesGif')?.value || '';
+    const gifPart = (gifOn && gifUrl) ? `\n[ ](${gifUrl})\n` : '';
+
+    const extras = simplesFields
+        .filter(f => f.label.trim())
+        .map(f => `{{${f.label.trim()}=${f.value}}}`)
+        .join('');
+
+    return `&{template:custom}{{name=${name}}}${extras}{{description=${desc}${gifPart}}}`;
+}
+
 function openTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(t => {
         t.classList.remove('active');
@@ -197,7 +255,7 @@ function openTab(tabId) {
     // Controlar visibilidade da seção global-info
     const globalInfoSection = document.getElementById('globalInfoSection');
     if (globalInfoSection) {
-        if (tabId === 'seletor' || tabId === 'avancado') {
+        if (tabId === 'seletor' || tabId === 'avancado' || tabId === 'simples') {
             globalInfoSection.style.display = 'none';
         } else {
             globalInfoSection.style.display = 'block';
@@ -272,6 +330,10 @@ function updateAll() {
     currentDiceOnly = `[[${fullDice}]]`;
     document.getElementById('outputAvancado').value = `&{template:custom}{{infoname=${advD}}}{{description=**Resultado:** [[${fullDice}]]}}`;
 
+    // --- MODELO SIMPLES ---
+    const simplesOutput = document.getElementById('outputSimples');
+    if (simplesOutput) simplesOutput.value = generateSimplesMacro();
+
     const currentTab = localStorage.getItem('forge_lastTab') || 'pericia';
     const container = document.getElementById('pre-gif-container');
     if (currentTab === 'pericia') {
@@ -286,6 +348,12 @@ function updateAll() {
     } else if (currentTab === 'avancado') {
         document.getElementById('pre-skill').innerText = advD;
         container.innerHTML = "";
+    } else if (currentTab === 'simples') {
+        const sn = document.getElementById('simplesName')?.value || 'Habilidade';
+        document.getElementById('pre-skill').innerText = sn;
+        const gifOn = document.getElementById('checkSimplesGif')?.checked;
+        const gifUrl = document.getElementById('urlSimplesGif')?.value || '';
+        container.innerHTML = (gifOn && gifUrl) ? `<img src="${gifUrl}">` : "";
     }
     saveData();
 }
@@ -313,16 +381,64 @@ function executeTestRoll() {
             total += bonus;
         }
         limitReached = anyLimit;
+
+    } else if (currentTab === 'simples') {
+        // Coleta todos os textos dos campos extras + descrição
+        const allTexts = [
+            ...simplesFields.map(f => `${f.label}: ${f.value}`),
+            document.getElementById('simplesDesc')?.value || ''
+        ];
+
+        // Extrai todas as expressões NdX únicas encontradas nos textos
+        const diceRegex = /(\d+)d(\d+)/gi;
+        const foundExpressions = [];
+        const seen = new Set();
+        allTexts.forEach(text => {
+            let m;
+            while ((m = diceRegex.exec(text)) !== null) {
+                const key = m[0].toLowerCase();
+                if (!seen.has(key)) { seen.add(key); foundExpressions.push({ num: parseInt(m[1]), sides: parseInt(m[2]), expr: m[0] }); }
+            }
+        });
+
+        if (foundExpressions.length === 0) {
+            // Nenhum dado encontrado: avisa o usuário
+            detailsText.innerText = 'Nenhuma expressão de dados (NdX) encontrada nos campos.';
+            resultValue.innerText = '—';
+            const box = document.querySelector('.r20-result-box');
+            box.style.borderColor = 'var(--roll-green)';
+            resultValue.style.color = 'var(--roll-green)';
+            return;
+        }
+
+        // Rola cada expressão e monta os detalhes
+        const MAX = 100;
+        foundExpressions.forEach(({ num, sides, expr }) => {
+            const rolls = [];
+            let groupTotal = 0;
+            let hitLimit = false;
+            let iter = 0;
+            for (let i = 0; i < num; i++) {
+                const val = Math.floor(Math.random() * sides) + 1;
+                rolls.push(val);
+                groupTotal += val;
+                // explosão simples se o dado explodir (não temos configuração aqui, só rolagem crua)
+            }
+            total += groupTotal;
+            const rollStr = rolls.length === 1 ? String(rolls[0]) : `[${rolls.join(' ')}]`;
+            details.push(`${expr}:${rollStr}=${groupTotal}`);
+        });
+
     } else {
         let r1 = Math.floor(Math.random() * 20) + 1;
         if (document.getElementById('rollVantagem').checked) {
             let r2 = Math.floor(Math.random() * 20) + 1;
             total = Math.max(r1, r2);
-            details.push(`[${r1}, ${r2}] kh1`);
+            details.push(`[${r1}, ${r2}] → kh1`);
         } else if (document.getElementById('rollDesvantagem').checked) {
             let r2 = Math.floor(Math.random() * 20) + 1;
             total = Math.min(r1, r2);
-            details.push(`[${r1}, ${r2}] kl1`);
+            details.push(`[${r1}, ${r2}] → kl1`);
         } else {
             total = r1;
             details.push(r1);
@@ -331,7 +447,7 @@ function executeTestRoll() {
 
     resultValue.innerText = total;
     const limitWarning = limitReached ? ' ⚠️ limite atingido' : '';
-    detailsText.innerText = `Rolagem: ${details.join(' ')}${limitWarning}`;
+    detailsText.innerText = `${details.join('   ')}${limitWarning}`;
 
     const box = document.querySelector('.r20-result-box');
     box.style.borderColor = limitReached ? '#e74c3c' : 'var(--roll-green)';
@@ -350,7 +466,11 @@ function copyDiceOnly() {
 
 function copyAndLog(id, type) {
     const text = document.getElementById(id).value;
-    const label = (type === 'Combate') ? document.getElementById('atkWeapon').value : (type === 'Perícia' ? document.getElementById('skillName').value : (type === 'Avançado' ? document.getElementById('advDesc').value : document.getElementById('queryTitle').value));
+    const label = (type === 'Combate') ? document.getElementById('atkWeapon').value
+        : (type === 'Perícia') ? document.getElementById('skillName').value
+            : (type === 'Avançado') ? document.getElementById('advDesc').value
+                : (type === 'Simples') ? document.getElementById('simplesName').value
+                    : document.getElementById('queryTitle').value;
 
     navigator.clipboard.writeText(text);
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -401,6 +521,11 @@ function saveData() {
         advD: document.getElementById('advDesc').value, advB: document.getElementById('advBonus').value,
         fm: document.getElementById('failMargin').value,
         dg: JSON.parse(JSON.stringify(diceGroups)),
+        smName: document.getElementById('simplesName')?.value || '',
+        smDesc: document.getElementById('simplesDesc')?.value || '',
+        smGif: document.getElementById('checkSimplesGif')?.checked || false,
+        smUrl: document.getElementById('urlSimplesGif')?.value || '',
+        smFields: JSON.parse(JSON.stringify(simplesFields)),
         sb: selectorButtons, attrs: attrStates
     };
     localStorage.setItem('forge_vFinal', JSON.stringify(d));
@@ -425,6 +550,11 @@ window.onload = () => {
         document.getElementById('advBonus').value = d.advB || "0";
         document.getElementById('failMargin').value = d.fm || "";
         if (d.dg && d.dg.length) diceGroups = d.dg;
+        if (document.getElementById('simplesName')) document.getElementById('simplesName').value = d.smName || '';
+        if (document.getElementById('simplesDesc')) document.getElementById('simplesDesc').value = d.smDesc || '';
+        if (document.getElementById('checkSimplesGif')) document.getElementById('checkSimplesGif').checked = d.smGif || false;
+        if (document.getElementById('urlSimplesGif')) document.getElementById('urlSimplesGif').value = d.smUrl || '';
+        if (d.smFields) { simplesFields = d.smFields; renderSimplesFields(); }
         selectorButtons = d.sb || [];
         if (d.attrs) Object.keys(d.attrs).forEach(key => { const cb = document.querySelector(`.attr-mod[value="${key}"]`); if (cb) cb.checked = d.attrs[key]; });
         renderButtons();
