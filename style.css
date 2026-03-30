@@ -835,3 +835,57 @@ details[open] summary::after {
     color: rgba(15, 23, 42, .68);
     font-size: 12px;
 }
+
+/* ================================================================
+   MODELO SIMPLES
+   ================================================================ */
+.simples-fields-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 14px 0 8px;
+}
+
+.simples-empty-hint {
+    font-size: 0.78rem;
+    color: #aaa;
+    text-align: center;
+    padding: 8px 0 4px;
+    font-style: italic;
+}
+
+.simples-field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.simples-label-input {
+    flex: 1;
+    min-width: 0;
+    font-family: 'Courier New', monospace !important;
+    font-size: 0.85rem !important;
+    font-weight: bold;
+    color: var(--accent-dark);
+}
+
+.simples-field-sep {
+    font-weight: bold;
+    color: #999;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.simples-value-input {
+    flex: 2;
+    min-width: 0;
+    font-size: 0.85rem !important;
+}
+
+.simples-desc-input {
+    min-height: 90px;
+    resize: vertical;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
