@@ -19,6 +19,7 @@
             <button class="tab-btn active" id="btn-tab-pericia" onclick="openTab('pericia')">⚔️ Perícia</button>
             <button class="tab-btn" id="btn-tab-combate" onclick="openTab('combate')">🛡️ Combate</button>
             <button class="tab-btn" id="btn-tab-seletor" onclick="openTab('seletor')">⚙️ Gerar Seletor</button>
+            <button class="tab-btn" id="btn-tab-simples" onclick="openTab('simples')">📋 Modelo Simples</button>
             <button class="tab-btn" id="btn-tab-avancado" onclick="openTab('avancado')">✨ Avançado</button>
         </nav>
 
@@ -153,11 +154,49 @@
             </div>
         </div>
 
+        <!-- ABA MODELO SIMPLES -->
+        <div id="simples" class="tab-content">
+            <div class="input-group">
+                <label>Nome do Efeito / Habilidade</label>
+                <input type="text" id="simplesName" placeholder="Ex: Bola de Fogo" oninput="updateAll()">
+            </div>
+
+            <div class="simples-fields-header">
+                <label style="margin:0;">Campos Extras <span
+                        style="font-weight:normal; color:#999;">(opcional)</span></label>
+                <button class="btn-add" onclick="addSimplesField()">+ CAMPO</button>
+            </div>
+            <div id="simplesFieldsContainer"></div>
+
+            <div class="input-group" style="margin-top:12px;">
+                <label>Descrição</label>
+                <textarea id="simplesDesc" class="simples-desc-input"
+                    placeholder="Ex: Uma explosão de chamas no local definido ou ao acertar um alvo..."
+                    oninput="updateAll()"></textarea>
+            </div>
+
+            <details class="collapsible">
+                <summary>🖼️ GIF / Imagem</summary>
+                <div class="details-content">
+                    <div class="media-item">
+                        <input type="checkbox" id="checkSimplesGif" onchange="updateAll()">
+                        <input type="text" id="urlSimplesGif" placeholder="URL do GIF/Imagem" oninput="updateAll()">
+                    </div>
+                </div>
+            </details>
+
+            <div class="output-box">
+                <textarea id="outputSimples" class="macro-output" readonly></textarea>
+                <button class="btn-copy" onclick="copyAndLog('outputSimples', 'Simples')">Copiar e Salvar no
+                    Log</button>
+            </div>
+        </div>
+
         <!-- ABA AVANÇADO -->
         <div id="avancado" class="tab-content">
             <div class="input-group">
                 <label>Descrição da Rolagem</label>
-                <input type="text" id="advDesc" placeholder="Ex: Bola de Fogo" oninput="updateAll()">
+                <input type="text" id="advDesc" placeholder="Ex: Bola de Fogo Exposiva!" oninput="updateAll()">
             </div>
             <div id="diceGroupsContainer"></div>
             <button class="btn-add" style="width:100%; padding:10px; margin-bottom:15px;" onclick="addDiceGroup()">+
