@@ -889,3 +889,77 @@ details[open] summary::after {
     font-size: 0.9rem;
     line-height: 1.5;
 }
+
+/* --- Repetições ×N no Modelo Simples --- */
+.simples-count-sep {
+    font-weight: bold;
+    color: var(--primary-red);
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    cursor: help;
+    user-select: none;
+}
+
+.simples-count-input {
+    width: 46px !important;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 0.85rem !important;
+    font-weight: bold;
+    color: var(--primary-red);
+    border-color: var(--primary-red) !important;
+    padding: 6px 4px !important;
+}
+
+/* --- Campo "Ataques" no Combate --- */
+.atk-count-group {
+    flex: 0 0 72px !important;
+}
+
+.atk-count-group input {
+    text-align: center;
+    font-weight: bold;
+    color: var(--primary-red);
+    border-color: var(--primary-red) !important;
+}
+
+/* --- Seletor de Perícia de Combate --- */
+.combat-skill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0 14px;
+    align-items: center;
+}
+
+.combat-skill-btn {
+    padding: 6px 14px;
+    border: 2px solid var(--border-color);
+    background: white;
+    color: var(--text-dark);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.combat-skill-btn:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.combat-skill-btn.active {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
+}
+
+.combat-skill-input {
+    flex: 1;
+    min-width: 120px;
+    font-size: 0.85rem !important;
+    font-style: italic;
+}

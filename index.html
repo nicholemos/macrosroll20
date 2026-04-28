@@ -87,6 +87,25 @@
                         oninput="updateAll()"></div>
                 <div class="input-group"><label>Dano Extra</label><input type="text" id="atkExtraDmg"
                         placeholder="Ex: 2 ou 1d6" oninput="updateAll()"></div>
+                <div class="input-group atk-count-group"
+                    title="Ataques idênticos. O 1º inclui lógica de crítico/GIF; os demais aparecem como pares Ataque N + Dano N.">
+                    <label>Ataques</label>
+                    <input type="number" id="atkCount" value="1" min="1" max="10" oninput="updateAll()">
+                </div>
+            </div>
+
+            <label style="margin-top:15px;">Perícia de Combate</label>
+            <div class="combat-skill-row">
+                <button class="combat-skill-btn active" data-skill="Luta" onclick="setCombatSkill('Luta')">Luta</button>
+                <button class="combat-skill-btn" data-skill="Pontaria"
+                    onclick="setCombatSkill('Pontaria')">Pontaria</button>
+                <button class="combat-skill-btn" data-skill="Atuação"
+                    onclick="setCombatSkill('Atuação')">Atuação</button>
+                <button class="combat-skill-btn" data-skill="Misticismo"
+                    onclick="setCombatSkill('Misticismo')">Misticismo</button>
+                <input type="text" id="combatSkillInput" class="combat-skill-input" value="Luta"
+                    placeholder="Outra perícia..." oninput="onCombatSkillInput(this.value)"
+                    title="Nome exato da perícia no Roll20 (sem acentos na ficha)">
             </div>
 
             <label style="margin-top:15px;">Selecione os Atributos (Dano)</label>
@@ -99,7 +118,7 @@
                         onchange="updateAll()"> CON</label>
                 <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="int_mod"
                         onchange="updateAll()"> INT</label>
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="wis_mod"
+                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="sab_mod"
                         onchange="updateAll()"> SAB</label>
                 <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="cha_mod"
                         onchange="updateAll()"> CAR</label>

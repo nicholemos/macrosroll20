@@ -5,6 +5,8 @@ let selectorButtons = [];
 let macroLog = [];
 let currentDiceOnly = "";
 let simplesFields = []; // [{label, value}]
+let atkCount = 1;
+let combatSkill = 'luta';
 
 // ================================================================
 //  DICE GROUPS – state & helpers
@@ -184,7 +186,7 @@ function simulateGroup(g) {
 //  MODELO SIMPLES – campos extras dinâmicos
 // ================================================================
 function addSimplesField() {
-    simplesFields.push({ label: '', value: '' });
+    simplesFields.push({ label: '', value: '', count: 1 });
     renderSimplesFields();
     updateAll();
 }
@@ -210,16 +212,21 @@ function renderSimplesFields() {
         return;
     }
 
-    container.innerHTML = simplesFields.map((f, i) => `
+    container.innerHTML = simplesFields.map((f, i) => {
+        const count = f.count || 1;
+        return `
         <div class="simples-field-row">
-            <input type="text" class="simples-label-input" placeholder="Rótulo (ex: Dano)"
+            <input type="text" class="simples-label-input" placeholder="Rótulo (ex: Ataque)"
                 value="${f.label}" oninput="updateSimplesField(${i},'label',this.value)">
             <span class="simples-field-sep">=</span>
-            <input type="text" class="simples-value-input" placeholder="Valor (ex: 6d6)"
+            <input type="text" class="simples-value-input" placeholder="Valor (ex: [[1d20+5]])"
                 value="${f.value}" oninput="updateSimplesField(${i},'value',this.value)">
+            <span class="simples-count-sep" title="Repetir este campo N vezes (ex: 4 ataques iguais)">×</span>
+            <input type="number" class="simples-count-input" min="1" max="20" value="${count}"
+                oninput="updateSimplesField(${i},'count',+this.value)">
             <button class="dg-remove-btn" onclick="removeSimplesField(${i})">×</button>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 function generateSimplesMacro() {
@@ -231,7 +238,15 @@ function generateSimplesMacro() {
 
     const extras = simplesFields
         .filter(f => f.label.trim())
-        .map(f => `{{${f.label.trim()}=${f.value}}}`)
+        .map(f => {
+            const count = f.count || 1;
+            if (count <= 1) return `{{${f.label.trim()}=${f.value}}}`;
+            let parts = '';
+            for (let n = 1; n <= count; n++) {
+                parts += `{{${f.label.trim()} ${n}=${f.value}}}`;
+            }
+            return parts;
+        })
         .join('');
 
     return `&{template:custom}{{name=${name}}}${extras}{{description=${desc}${gifPart}}}`;
@@ -277,6 +292,28 @@ function getSelectedAttributes() {
     return selected.length > 0 ? selected.join('+') : "0";
 }
 
+function setCombatSkill(val) {
+    combatSkill = sanitize(val) || 'luta';
+    // Atualiza o input de texto com o valor selecionado
+    const inp = document.getElementById('combatSkillInput');
+    if (inp) inp.value = val;
+    // Destaca o botão ativo
+    document.querySelectorAll('.combat-skill-btn').forEach(btn => {
+        btn.classList.toggle('active', sanitize(btn.dataset.skill) === combatSkill);
+    });
+    updateAll();
+}
+
+function onCombatSkillInput(val) {
+    combatSkill = sanitize(val) || 'luta';
+    // Remove destaque dos botões se o valor não bater com nenhum preset
+    document.querySelectorAll('.combat-skill-btn').forEach(btn => {
+        btn.classList.toggle('active', sanitize(btn.dataset.skill) === combatSkill);
+    });
+    updateAll();
+}
+
+
 function updateAll() {
     const name = document.getElementById('charName').value || "Nome";
     const margin = document.getElementById('critMargin').value || "20";
@@ -300,6 +337,10 @@ function updateAll() {
     const dd = document.getElementById('atkDmgDice').value || "1d6";
     const extra = document.getElementById('atkExtraDmg').value || "0";
     const mult = parseInt(document.getElementById('atkCritMult').value) || 2;
+    atkCount = parseInt(document.getElementById('atkCount')?.value) || 1;
+    // Lê a perícia de combate do input (sanitiza para gerar o nome do atributo no roll20)
+    const rawSkill = document.getElementById('combatSkillInput')?.value || 'Luta';
+    combatSkill = sanitize(rawSkill) || 'luta';
     const attrString = getSelectedAttributes();
     const gAtkCrit = document.getElementById('checkAtkCrit').checked ? `[gif](${document.getElementById('urlAtkCrit').value})` : "";
     const gAtkNorm = document.getElementById('checkAtkNorm').checked ? `[gif](${document.getElementById('urlAtkNorm').value})` : "";
@@ -307,7 +348,18 @@ function updateAll() {
     let cDmgParts = [];
     for (let i = 0; i < mult; i++) { cDmgParts.push(dd); }
     const cDmg = cDmgParts.join(' + ') + ` + ${attrString} + ${extra}`;
-    document.getElementById('outputCombate').value = `&{template:custom}{{name=@{${name}|character_name}}}{{secondname= *${w}* }}{{rollname=Rolagem }}{{theroll=[[${db}cs>${margin}${cfStr}+[[@{${name}|lutatotal}+@{${name}|condicaomodataque}]]+@{${name}|ataquetemp}]]}} {{criticalname=Dano}}{{ifcritical=[[${cDmg}]] CRITICO \n${gAtkCrit}}}{{notcritical=[[${dd}+${attrString}+${extra}+@{${name}|danotemp}+@{${name}|rolltemp}]] ${gAtkNorm}}}{{ifcriticalerror=${gAtkFail}}}`;
+    const atkRoll = `[[${db}cs>${margin}${cfStr}+[[@{${name}|${combatSkill}total}+@{${name}|condicaomodataque}]]+@{${name}|ataquetemp}]]`;
+    const normDmg = `[[${dd}+${attrString}+${extra}+@{${name}|danotemp}+@{${name}|rolltemp}]]`;
+
+    // Ataque 1 — completo com crítico/GIF
+    let combateMacro = `&{template:custom}{{name=@{${name}|character_name}}}{{secondname= *${w}* }}{{rollname=Rolagem }}{{theroll=${atkRoll}}} {{criticalname=Dano}}{{ifcritical=[[${cDmg}]] CRITICO \n${gAtkCrit}}}{{notcritical=${normDmg} ${gAtkNorm}}}{{ifcriticalerror=${gAtkFail}}}`;
+
+    // Ataques 2..N — pares simples
+    for (let n = 2; n <= atkCount; n++) {
+        combateMacro += `{{Ataque ${n}=${atkRoll}}}{{Dano ${n}=${normDmg}}}`;
+    }
+
+    document.getElementById('outputCombate').value = combateMacro;
 
     // --- SELETOR ---
     const st = document.getElementById('queryTitle').value || "Opções";
@@ -515,6 +567,8 @@ function saveData() {
         cc: document.getElementById('checkCrit').checked, cn: document.getElementById('checkNormal').checked, cf: document.getElementById('checkFail').checked,
         dm: document.querySelector('input[name="diceMod"]:checked')?.id || 'rollNormal',
         aw: document.getElementById('atkWeapon').value, ad: document.getElementById('atkDmgDice').value, ax: document.getElementById('atkExtraDmg').value, am: document.getElementById('atkCritMult').value,
+        ac: parseInt(document.getElementById('atkCount')?.value) || 1,
+        ask: document.getElementById('combatSkillInput')?.value || 'Luta',
         uac: document.getElementById('urlAtkCrit').value, uan: document.getElementById('urlAtkNorm').value, uaf: document.getElementById('urlAtkFail').value,
         cac: document.getElementById('checkAtkCrit').checked, can: document.getElementById('checkAtkNorm').checked, caf: document.getElementById('checkAtkFail').checked,
         qt: document.getElementById('queryTitle').value, qcd: document.getElementById('querySelectorCD').value, usg: document.getElementById('urlSelectorGif').value, csg: document.getElementById('checkSelectorGif').checked,
@@ -542,6 +596,15 @@ window.onload = () => {
         if (d.dm && document.getElementById(d.dm)) document.getElementById(d.dm).checked = true;
         document.getElementById('atkWeapon').value = d.aw || ""; document.getElementById('atkDmgDice').value = d.ad || "1d6";
         document.getElementById('atkExtraDmg').value = d.ax || ""; document.getElementById('atkCritMult').value = d.am || "3";
+        if (document.getElementById('atkCount')) document.getElementById('atkCount').value = d.ac || 1;
+        if (d.ask && document.getElementById('combatSkillInput')) {
+            document.getElementById('combatSkillInput').value = d.ask;
+            // Destaca botão correspondente se for um preset
+            const sk = sanitize(d.ask);
+            document.querySelectorAll('.combat-skill-btn').forEach(btn => {
+                btn.classList.toggle('active', sanitize(btn.dataset.skill) === sk);
+            });
+        }
         document.getElementById('urlAtkCrit').value = d.uac || ""; document.getElementById('urlAtkNorm').value = d.uan || ""; document.getElementById('urlAtkFail').value = d.uaf || "";
         document.getElementById('checkAtkCrit').checked = d.cac || false; document.getElementById('checkAtkNorm').checked = d.can || false; document.getElementById('checkAtkFail').checked = d.caf || false;
         document.getElementById('queryTitle').value = d.qt || "Selecione o teste"; document.getElementById('querySelectorCD').value = d.qcd || "";
