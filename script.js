@@ -285,9 +285,9 @@ function sanitize(text) {
     return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, '');
 }
 
-function getSelectedAttributes() {
+function getSelectedAttributes(cls = 'attr-dmg') {
     const name = document.getElementById('charName').value || "Nome";
-    const checkboxes = document.querySelectorAll('.attr-mod:checked');
+    const checkboxes = document.querySelectorAll(`.${cls}:checked`);
     const selected = Array.from(checkboxes).map(cb => `@{${name}|${cb.value}}`);
     return selected.length > 0 ? selected.join('+') : "0";
 }
@@ -341,15 +341,16 @@ function updateAll() {
     // Lê a perícia de combate do input (sanitiza para gerar o nome do atributo no roll20)
     const rawSkill = document.getElementById('combatSkillInput')?.value || 'Luta';
     combatSkill = sanitize(rawSkill) || 'luta';
-    const attrString = getSelectedAttributes();
+    const rollAttrString = getSelectedAttributes('attr-roll');
+    const dmgAttrString  = getSelectedAttributes('attr-dmg');
     const gAtkCrit = document.getElementById('checkAtkCrit').checked ? `[gif](${document.getElementById('urlAtkCrit').value})` : "";
     const gAtkNorm = document.getElementById('checkAtkNorm').checked ? `[gif](${document.getElementById('urlAtkNorm').value})` : "";
     const gAtkFail = document.getElementById('checkAtkFail').checked ? `[gif](${document.getElementById('urlAtkFail').value})` : "";
     let cDmgParts = [];
     for (let i = 0; i < mult; i++) { cDmgParts.push(dd); }
-    const cDmg = cDmgParts.join(' + ') + ` + ${attrString} + ${extra}`;
-    const atkRoll = `[[${db}cs>${margin}${cfStr}+[[@{${name}|${combatSkill}total}+@{${name}|condicaomodataque}]]+@{${name}|ataquetemp}]]`;
-    const normDmg = `[[${dd}+${attrString}+${extra}+@{${name}|danotemp}+@{${name}|rolltemp}]]`;
+    const cDmg    = cDmgParts.join(' + ') + ` + ${dmgAttrString} + ${extra}`;
+    const atkRoll = `[[${db}cs>${margin}${cfStr}+[[@{${name}|${combatSkill}total}+@{${name}|condicaomodataque}]]+${rollAttrString}+@{${name}|ataquetemp}]]`;
+    const normDmg = `[[${dd}+${dmgAttrString}+${extra}+@{${name}|danotemp}+@{${name}|rolltemp}]]`;
 
     // Ataque 1 — completo com crítico/GIF
     let combateMacro = `&{template:custom}{{name=@{${name}|character_name}}}{{secondname= *${w}* }}{{rollname=Rolagem }}{{theroll=${atkRoll}}} {{criticalname=Dano}}{{ifcritical=[[${cDmg}]] CRITICO \n${gAtkCrit}}}{{notcritical=${normDmg} ${gAtkNorm}}}{{ifcriticalerror=${gAtkFail}}}`;
@@ -559,8 +560,9 @@ function removeButton(i) { selectorButtons.splice(i, 1); renderButtons(); update
 function handleEnter(e) { if (e.key === 'Enter') addButton(); }
 
 function saveData() {
-    const attrStates = {};
-    document.querySelectorAll('.attr-mod').forEach(cb => attrStates[cb.value] = cb.checked);
+    const rollStates = {}, dmgStates = {};
+    document.querySelectorAll('.attr-roll').forEach(cb => rollStates[cb.value] = cb.checked);
+    document.querySelectorAll('.attr-dmg').forEach(cb => dmgStates[cb.value] = cb.checked);
     const d = {
         n: document.getElementById('charName').value, m: document.getElementById('critMargin').value,
         sn: document.getElementById('skillName').value, uc: document.getElementById('urlCrit').value, un: document.getElementById('urlNormal').value, uf: document.getElementById('urlFail').value,
@@ -580,7 +582,7 @@ function saveData() {
         smGif: document.getElementById('checkSimplesGif')?.checked || false,
         smUrl: document.getElementById('urlSimplesGif')?.value || '',
         smFields: JSON.parse(JSON.stringify(simplesFields)),
-        sb: selectorButtons, attrs: attrStates
+        sb: selectorButtons, attrRoll: rollStates, attrDmg: dmgStates
     };
     localStorage.setItem('forge_vFinal', JSON.stringify(d));
 }
@@ -619,7 +621,10 @@ window.onload = () => {
         if (document.getElementById('urlSimplesGif')) document.getElementById('urlSimplesGif').value = d.smUrl || '';
         if (d.smFields) { simplesFields = d.smFields; renderSimplesFields(); }
         selectorButtons = d.sb || [];
-        if (d.attrs) Object.keys(d.attrs).forEach(key => { const cb = document.querySelector(`.attr-mod[value="${key}"]`); if (cb) cb.checked = d.attrs[key]; });
+        if (d.attrRoll) Object.keys(d.attrRoll).forEach(key => { const cb = document.querySelector(`.attr-roll[value="${key}"]`); if (cb) cb.checked = d.attrRoll[key]; });
+        if (d.attrDmg)  Object.keys(d.attrDmg).forEach(key => { const cb = document.querySelector(`.attr-dmg[value="${key}"]`);  if (cb) cb.checked = d.attrDmg[key]; });
+        // Compatibilidade com saves antigos (attr-mod)
+        if (d.attrs && !d.attrDmg) Object.keys(d.attrs).forEach(key => { const cb = document.querySelector(`.attr-dmg[value="${key}"]`); if (cb) cb.checked = d.attrs[key]; });
         renderButtons();
         renderDiceGroups();
     }

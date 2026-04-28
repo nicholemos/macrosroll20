@@ -108,20 +108,29 @@
                     title="Nome exato da perícia no Roll20 (sem acentos na ficha)">
             </div>
 
-            <label style="margin-top:15px;">Selecione os Atributos (Dano)</label>
-            <div class="attribute-grid">
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="for_mod"
-                        onchange="updateAll()"> FOR</label>
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="des_mod"
-                        onchange="updateAll()"> DES</label>
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="con_mod"
-                        onchange="updateAll()"> CON</label>
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="int_mod"
-                        onchange="updateAll()"> INT</label>
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="sab_mod"
-                        onchange="updateAll()"> SAB</label>
-                <label class="attr-checkbox"><input type="checkbox" class="attr-mod" value="cha_mod"
-                        onchange="updateAll()"> CAR</label>
+            <div class="attr-double-row">
+                <div class="attr-half">
+                    <label>Atributo na Rolagem</label>
+                    <div class="attribute-grid">
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="for_mod" onchange="updateAll()"> FOR</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="des_mod" onchange="updateAll()"> DES</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="con_mod" onchange="updateAll()"> CON</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="int_mod" onchange="updateAll()"> INT</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="sab_mod" onchange="updateAll()"> SAB</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="cha_mod" onchange="updateAll()"> CAR</label>
+                    </div>
+                </div>
+                <div class="attr-half">
+                    <label>Atributo no Dano</label>
+                    <div class="attribute-grid">
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="for_mod" onchange="updateAll()"> FOR</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="des_mod" onchange="updateAll()"> DES</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="con_mod" onchange="updateAll()"> CON</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="int_mod" onchange="updateAll()"> INT</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="sab_mod" onchange="updateAll()"> SAB</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="cha_mod" onchange="updateAll()"> CAR</label>
+                    </div>
+                </div>
             </div>
 
             <details class="collapsible">

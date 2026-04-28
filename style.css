@@ -113,7 +113,29 @@ label,
     padding: 10px;
     border-radius: 6px;
     border: 1px solid var(--border-color);
+    margin-bottom: 4px;
+}
+
+.attr-double-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
     margin-bottom: 15px;
+}
+
+.attr-half {
+    flex: 1;
+    min-width: 0;
+}
+
+.attr-half > label {
+    display: block;
+    font-family: 'Tormenta';
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    text-transform: uppercase;
 }
 
 .attr-checkbox {
