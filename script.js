@@ -355,9 +355,9 @@ function updateAll() {
     // Ataque 1 — completo com crítico/GIF
     let combateMacro = `&{template:custom}{{name=@{${name}|character_name}}}{{secondname= *${w}* }}{{rollname=Rolagem }}{{theroll=${atkRoll}}} {{criticalname=Dano}}{{ifcritical=[[${cDmg}]] CRITICO \n${gAtkCrit}}}{{notcritical=${normDmg} ${gAtkNorm}}}{{ifcriticalerror=${gAtkFail}}}`;
 
-    // Ataques 2..N — pares simples
+    // Ataques 2..N — rolagem com cs> + dano normal e crítico separados
     for (let n = 2; n <= atkCount; n++) {
-        combateMacro += `{{Ataque ${n}=${atkRoll}}}{{Dano ${n}=${normDmg}}}`;
+        combateMacro += `{{Ataque ${n}=${atkRoll}}}{{Dano ${n}=${normDmg}}}{{Crítico ${n}=[[${cDmg}]]}}`;
     }
 
     document.getElementById('outputCombate').value = combateMacro;
