@@ -985,3 +985,52 @@ details[open] summary::after {
     font-size: 0.85rem !important;
     font-style: italic;
 }
+
+/* ================================================================
+   ABA MAGIA
+   ================================================================ */
+.spell-section {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 12px 0;
+    background: #fafafa;
+}
+
+.spell-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Tormenta';
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+.spell-toggle-label input[type="checkbox"] {
+    width: auto !important;
+    height: auto !important;
+    accent-color: var(--primary-red);
+    transform: scale(1.2);
+}
+
+.spell-sub.hidden {
+    display: none;
+}
+
+#spellDmgDie, #spellDmgBase, #spellDmgPerPM {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    color: var(--text-dark);
+}
+
+#spellDmgDie:focus, #spellDmgBase:focus, #spellDmgPerPM:focus {
+    outline: none;
+    border-color: var(--primary-red);
+}

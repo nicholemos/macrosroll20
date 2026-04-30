@@ -18,6 +18,7 @@
         <nav class="tabs">
             <button class="tab-btn active" id="btn-tab-pericia" onclick="openTab('pericia')">⚔️ Perícia</button>
             <button class="tab-btn" id="btn-tab-combate" onclick="openTab('combate')">🛡️ Combate</button>
+            <button class="tab-btn" id="btn-tab-magia" onclick="openTab('magia')">🔮 Magia</button>
             <button class="tab-btn" id="btn-tab-seletor" onclick="openTab('seletor')">⚙️ Gerar Seletor</button>
             <button class="tab-btn" id="btn-tab-simples" onclick="openTab('simples')">📋 Modelo Simples</button>
             <button class="tab-btn" id="btn-tab-avancado" onclick="openTab('avancado')">✨ Avançado</button>
@@ -27,7 +28,9 @@
             <div class="input-row">
                 <div class="input-group" style="flex: 2;">
                     <label>Nome do Personagem</label>
-                    <input type="text" id="charName" placeholder="Nome do Personagem no roll20" oninput="updateAll()">
+                    <input type="text" id="charName" placeholder="Nome do Personagem no roll20" oninput="updateAll()"
+                        value="selected">
+                    <label>Ou mantenha "selected", assim funciona no token selecionado</label>
                 </div>
                 <div class="input-group" style="flex: 1;">
                     <label>Crítico ≥</label>
@@ -112,23 +115,35 @@
                 <div class="attr-half">
                     <label>Atributo na Rolagem</label>
                     <div class="attribute-grid">
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="for_mod" onchange="updateAll()"> FOR</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="des_mod" onchange="updateAll()"> DES</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="con_mod" onchange="updateAll()"> CON</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="int_mod" onchange="updateAll()"> INT</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="sab_mod" onchange="updateAll()"> SAB</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="cha_mod" onchange="updateAll()"> CAR</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="for_mod"
+                                onchange="updateAll()"> FOR</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="des_mod"
+                                onchange="updateAll()"> DES</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="con_mod"
+                                onchange="updateAll()"> CON</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="int_mod"
+                                onchange="updateAll()"> INT</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="sab_mod"
+                                onchange="updateAll()"> SAB</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-roll" value="cha_mod"
+                                onchange="updateAll()"> CAR</label>
                     </div>
                 </div>
                 <div class="attr-half">
                     <label>Atributo no Dano</label>
                     <div class="attribute-grid">
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="for_mod" onchange="updateAll()"> FOR</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="des_mod" onchange="updateAll()"> DES</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="con_mod" onchange="updateAll()"> CON</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="int_mod" onchange="updateAll()"> INT</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="sab_mod" onchange="updateAll()"> SAB</label>
-                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="cha_mod" onchange="updateAll()"> CAR</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="for_mod"
+                                onchange="updateAll()"> FOR</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="des_mod"
+                                onchange="updateAll()"> DES</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="con_mod"
+                                onchange="updateAll()"> CON</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="int_mod"
+                                onchange="updateAll()"> INT</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="sab_mod"
+                                onchange="updateAll()"> SAB</label>
+                        <label class="attr-checkbox"><input type="checkbox" class="attr-dmg" value="cha_mod"
+                                onchange="updateAll()"> CAR</label>
                     </div>
                 </div>
             </div>
@@ -148,6 +163,132 @@
                 <textarea id="outputCombate" class="macro-output" readonly></textarea>
                 <button class="btn-copy" onclick="copyAndLog('outputCombate', 'Combate')">Copiar e Salvar no
                     Log</button>
+            </div>
+        </div>
+
+        <!-- ABA MAGIA -->
+        <div id="magia" class="tab-content">
+
+            <!-- Identificação -->
+            <div class="input-group">
+                <label>Nome da Magia</label>
+                <input type="text" id="spellName" placeholder="Ex: Toque Chocante" oninput="updateAll()">
+            </div>
+            <div class="input-group">
+                <label>Tipo / Escola</label>
+                <input type="text" id="spellType" placeholder="Ex: Arcana 1 (Evocação)" oninput="updateAll()">
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label>Execução</label><input type="text" id="spellExec" placeholder="padrão"
+                        oninput="updateAll()"></div>
+                <div class="input-group"><label>Duração</label><input type="text" id="spellDur"
+                        placeholder="instantânea" oninput="updateAll()"></div>
+                <div class="input-group"><label>Alcance</label><input type="text" id="spellRange" placeholder="toque"
+                        oninput="updateAll()"></div>
+                <div class="input-group"><label>Alvo / Área</label><input type="text" id="spellTarget"
+                        placeholder="1 criatura" oninput="updateAll()"></div>
+            </div>
+
+            <!-- Resistência -->
+            <div class="spell-section">
+                <label class="spell-toggle-label">
+                    <input type="checkbox" id="checkSpellResVar" onchange="toggleSpellResVar(); updateAll()">
+                    Resistência com variação (query do jogador)
+                </label>
+                <div id="spellResVarBlock" class="spell-sub hidden">
+                    <div class="input-group" style="margin-top:8px;"><label>Label da Pergunta</label>
+                        <input type="text" id="spellResLabel" placeholder="Ex: Aprimoramento de Acerto?"
+                            oninput="updateAll()">
+                    </div>
+                    <div class="input-group">
+                        <label>Opções (separadas por <code>|</code>)</label>
+                        <textarea id="spellResOpts" class="simples-desc-input" rows="2"
+                            placeholder="Não, Fortitude reduz à metade|Sim (+2 PM), Nenhuma (Ataque CC)"
+                            oninput="updateAll()"></textarea>
+                    </div>
+                </div>
+                <div id="spellResFixBlock" class="spell-sub" style="margin-top:8px;">
+                    <div class="input-group"><label>Resistência</label>
+                        <input type="text" id="spellResFix"
+                            placeholder="Ex: Fortitude (CD @{selected|cdtotal}) reduz metade" oninput="updateAll()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dano da Magia -->
+            <div class="spell-section">
+                <label style="font-weight:bold; display:block; margin-bottom:4px;">Dano Base da Magia</label>
+                <div class="input-row">
+                    <div class="input-group" style="flex:0 0 90px"><label>Dados</label>
+                        <input type="number" id="spellDmgBase" value="0" min="0" oninput="updateAll()">
+                    </div>
+                    <div class="input-group" style="flex:0 0 90px"><label>Tipo</label>
+                        <select id="spellDmgDie" onchange="updateAll()">
+                            <option>d4</option>
+                            <option>d6</option>
+                            <option selected>d8</option>
+                            <option>d10</option>
+                            <option>d12</option>
+                            <option>d20</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Dano Extra Fixo</label>
+                        <input type="text" id="spellDmgExtra" placeholder="Ex: 6" oninput="updateAll()">
+                    </div>
+                    <div class="input-group"><label>Tipo de Dano</label>
+                        <input type="text" id="spellDmgType" placeholder="Ex: fogo" oninput="updateAll()">
+                    </div>
+                </div>
+
+                <label class="spell-toggle-label" style="margin-top:12px;">
+                    <input type="checkbox" id="checkSpellDmgPM" onchange="toggleSpellDmgPM(); updateAll()">
+                    Aprimoramentos (Aumento de Dano)
+                </label>
+                <div id="spellDmgPMBlock" class="spell-sub hidden" style="margin-top:8px;">
+                    <div class="input-row">
+                        <div class="input-group"><label>Label da Query</label>
+                            <input type="text" id="spellPMLabel" placeholder="Ex: Aumento de dano" value="Aumento de dano" oninput="updateAll()">
+                        </div>
+                        <div class="input-group" style="flex:0 0 110px"><label>Dados por PM</label>
+                            <input type="number" id="spellDmgPerPM" value="1" min="0" oninput="updateAll()">
+                        </div>
+                        <div class="input-group" style="flex:0 0 110px"><label>Bônus por PM</label>
+                            <input type="number" id="spellDmgBonusPerPM" value="0" min="0" oninput="updateAll()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Atributo no Dano -->
+            <div class="attr-half" style="margin-top:4px; margin-bottom:12px;">
+                <label>Atributo no Dano</label>
+                <div class="attribute-grid">
+                    <label class="attr-checkbox"><input type="checkbox" class="attr-spell" value="for_mod"
+                            onchange="updateAll()"> FOR</label>
+                    <label class="attr-checkbox"><input type="checkbox" class="attr-spell" value="des_mod"
+                            onchange="updateAll()"> DES</label>
+                    <label class="attr-checkbox"><input type="checkbox" class="attr-spell" value="con_mod"
+                            onchange="updateAll()"> CON</label>
+                    <label class="attr-checkbox"><input type="checkbox" class="attr-spell" value="int_mod"
+                            onchange="updateAll()"> INT</label>
+                    <label class="attr-checkbox"><input type="checkbox" class="attr-spell" value="sab_mod"
+                            onchange="updateAll()"> SAB</label>
+                    <label class="attr-checkbox"><input type="checkbox" class="attr-spell" value="cha_mod"
+                            onchange="updateAll()"> CAR</label>
+                </div>
+            </div>
+
+            <!-- Descrição -->
+            <div class="input-group">
+                <label>Descrição / Aprimoramentos</label>
+                <textarea id="spellDesc" class="simples-desc-input" rows="4"
+                    placeholder="Ex: Aprimoramentos aplicados:&#10;+1 PM: Aumenta o dano em em +1d8+1. &#10;+2 PM: Ataque corpo a corpo (Resistência: Nenhuma).&#10;+2 PM: Área esfera 6m (Alcance: Pessoal)."
+                    oninput="updateAll()"></textarea>
+            </div>
+
+            <div class="output-box">
+                <textarea id="outputMagia" class="macro-output" readonly></textarea>
+                <button class="btn-copy" onclick="copyAndLog('outputMagia', 'Magia')">Copiar e Salvar no Log</button>
             </div>
         </div>
 
