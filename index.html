@@ -171,7 +171,10 @@
 
             <!-- Identificação -->
             <div class="input-group">
-                <label>Nome da Magia</label>
+                <div class="spell-name-header">
+                    <label>Nome da Magia</label>
+                    <button class="btn-grimorio" onclick="openGrimorio()">📖 Grimório</button>
+                </div>
                 <input type="text" id="spellName" placeholder="Ex: Toque Chocante" oninput="updateAll()">
             </div>
             <div class="input-group">
@@ -596,9 +599,37 @@
             </details>
         </section>
     </div>
+    <script src="spells_db.js"></script>
     <script src="script.js"></script>
 
 
+
+    <!-- MODAL GRIMÓRIO -->
+    <div id="grimorioOverlay" class="grimorio-overlay hidden" onclick="closeGrimorioIfBg(event)">
+        <div class="grimorio-modal">
+            <div class="grimorio-header">
+                <span class="grimorio-title">📖 Grimório</span>
+                <button class="grimorio-close" onclick="closeGrimorio()">×</button>
+            </div>
+            <div class="grimorio-filters">
+                <input type="text" id="grimorioSearch" class="grimorio-search"
+                    placeholder="Buscar magia..." oninput="renderGrimorio()">
+                <select id="grimorioCircle" onchange="renderGrimorio()">
+                    <option value="">Todos os círculos</option>
+                    <option value="1">1º círculo</option>
+                    <option value="2">2º círculo</option>
+                    <option value="3">3º círculo</option>
+                    <option value="4">4º círculo</option>
+                    <option value="5">5º círculo</option>
+                </select>
+                <select id="grimorioSchool" onchange="renderGrimorio()">
+                    <option value="">Todas as escolas</option>
+                </select>
+            </div>
+            <div id="grimorioCount" class="grimorio-count"></div>
+            <div id="grimorioList" class="grimorio-list"></div>
+        </div>
+    </div>
 
 </body>
 

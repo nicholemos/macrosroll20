@@ -295,10 +295,115 @@ function getSelectedAttributes(cls = 'attr-dmg') {
 // ================================================================
 //  MAGIA
 // ================================================================
+// ================================================================
+//  GRIMÓRIO
+// ================================================================
+function openGrimorio() {
+    // Popular select de escolas na primeira abertura
+    const schoolSel = document.getElementById('grimorioSchool');
+    if (schoolSel.options.length <= 1 && typeof SPELLS_DB !== 'undefined') {
+        const schools = [...new Set(SPELLS_DB.map(s => s.e).filter(Boolean))].sort();
+        schools.forEach(sc => {
+            const opt = document.createElement('option');
+            opt.value = sc; opt.textContent = sc;
+            schoolSel.appendChild(opt);
+        });
+    }
+    document.getElementById('grimorioOverlay').classList.remove('hidden');
+    document.getElementById('grimorioSearch').focus();
+    renderGrimorio();
+}
+
+function closeGrimorio() {
+    document.getElementById('grimorioOverlay').classList.add('hidden');
+}
+
+function closeGrimorioIfBg(e) {
+    if (e.target === document.getElementById('grimorioOverlay')) closeGrimorio();
+}
+
+function renderGrimorio() {
+    if (typeof SPELLS_DB === 'undefined') return;
+    const q = document.getElementById('grimorioSearch').value.toLowerCase().trim();
+    const circle = document.getElementById('grimorioCircle').value;
+    const school = document.getElementById('grimorioSchool').value;
+
+    const filtered = SPELLS_DB.filter(s => {
+        const matchQ = !q || s.n.toLowerCase().includes(q) || (s.desc || '').toLowerCase().includes(q);
+        const matchC = !circle || String(s.c) === circle;
+        const matchE = !school || s.e === school;
+        return matchQ && matchC && matchE;
+    });
+
+    document.getElementById('grimorioCount').textContent =
+        `${filtered.length} magia${filtered.length !== 1 ? 's' : ''} encontrada${filtered.length !== 1 ? 's' : ''}`;
+
+    const list = document.getElementById('grimorioList');
+    if (filtered.length === 0) {
+        list.innerHTML = '<div class="grimorio-empty">Nenhuma magia encontrada.</div>';
+        return;
+    }
+
+    list.innerHTML = filtered.map((s, i) => {
+        const idx = SPELLS_DB.indexOf(s);
+        const aprCount = s.aprimoramentos ? s.aprimoramentos.length : 0;
+        return `<div class="grimorio-item" onclick="selectSpell(${idx})">
+            <div class="grimorio-item-main">
+                <span class="grimorio-item-name">${s.n}</span>
+                <span class="grimorio-item-badges">
+                    <span class="grimorio-badge circle">${s.c}º</span>
+                    <span class="grimorio-badge school">${s.e || ''}</span>
+                    ${aprCount ? `<span class="grimorio-badge apr">${aprCount} apr.</span>` : ''}
+                </span>
+            </div>
+            <div class="grimorio-item-meta">${s.ex || ''} · ${s.d || ''} · ${s.a || ''} · ${s.al || ''}</div>
+        </div>`;
+    }).join('');
+}
+
+function selectSpell(idx) {
+    const s = SPELLS_DB[idx];
+    if (!s) return;
+
+    // Preencher campos de identificação
+    const sv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    sv('spellName', s.n);
+    sv('spellType', `${s.e ? s.e : ''} ${s.c ? s.c + 'º círculo' : ''}`.trim());
+    sv('spellExec', s.ex);
+    sv('spellDur', s.d);
+    sv('spellRange', s.a);
+    sv('spellTarget', s.al);
+
+    // Resistência — coloca como texto fixo (sem variação)
+    const resVarCb = document.getElementById('checkSpellResVar');
+    if (resVarCb) { resVarCb.checked = false; toggleSpellResVar(); }
+    sv('spellResFix', s.r);
+
+    // Descrição + aprimoramentos formatados
+    let desc = s.desc || '';
+    if (s.aprimoramentos && s.aprimoramentos.length > 0) {
+        const aprLines = s.aprimoramentos.map(a => `+${a.cost} PM: ${a.desc}`).join('\n');
+        desc += '\n\nAprimoramentos:\n' + aprLines;
+    }
+    sv('spellDesc', desc.trim());
+
+    // Limpar dano PM (usuário configura manualmente se quiser)
+    const dmgPMCb = document.getElementById('checkSpellDmgPM');
+    if (dmgPMCb) { dmgPMCb.checked = false; toggleSpellDmgPM(); }
+    sv('spellDmgFix', '');
+
+    closeGrimorio();
+    updateAll();
+}
+
 function toggleSpellResVar() {
-    const on = document.getElementById('checkSpellResVar').checked;
-    document.getElementById('spellResVarBlock').classList.toggle('hidden', !on);
-    document.getElementById('spellResFixBlock').classList.toggle('hidden', on);
+    const cb = document.getElementById('checkSpellResVar');
+    if (!cb) return;
+    const on = cb.checked;
+    const varBlock = document.getElementById('spellResVarBlock');
+    const fixBlock = document.getElementById('spellResFixBlock');
+    if (varBlock) varBlock.classList.toggle('hidden', !on);
+    if (fixBlock) fixBlock.classList.toggle('hidden', on);
 }
 
 function toggleSpellDmgPM() {
@@ -345,16 +450,16 @@ function generateSpellMacro() {
     const die = document.getElementById('spellDmgDie')?.value || "d8";
     const extraDmg = (document.getElementById('spellDmgExtra')?.value || "").trim();
     const dmgType = (document.getElementById('spellDmgType')?.value || "").trim();
-    
+
     let diceExpr = "";
     let extraExpr = extraDmg;
     let pmSpentLine = "";
-    
+
     if (document.getElementById('checkSpellDmgPM')?.checked) {
         const pmLabel = document.getElementById('spellPMLabel')?.value || "Aumento de dano";
         const pmDice = parseInt(document.getElementById('spellDmgPerPM')?.value) || 0;
         const pmBonus = parseInt(document.getElementById('spellDmgBonusPerPM')?.value) || 0;
-        
+
         let totalDiceNum = "";
         if (pmDice > 0) {
             if (baseDice > 0) {
@@ -365,27 +470,27 @@ function generateSpellMacro() {
         } else if (baseDice > 0) {
             totalDiceNum = `${baseDice}`;
         }
-        
+
         if (totalDiceNum) diceExpr = `${totalDiceNum}${die}`;
-        
+
         if (pmBonus > 0) {
             const pmBonusStr = `(?{${pmLabel}|0} * ${pmBonus})`;
             if (extraExpr) extraExpr += ` + ${pmBonusStr}`;
             else extraExpr = pmBonusStr;
         }
-        
+
         pmSpentLine = `*${pmLabel}:* +[[?{${pmLabel}|0} * ${pmDice}]] PMs`;
     } else {
         if (baseDice > 0) diceExpr = `${baseDice}${die}`;
     }
-    
+
     const allExtras = [extraExpr, attrStr].filter(Boolean).join(" + ");
     let finalFormula = diceExpr;
     if (allExtras) {
         if (finalFormula) finalFormula += ` + ${allExtras}`;
         else finalFormula = allExtras;
     }
-    
+
     if (finalFormula) {
         const typeStr = dmgType ? ` de ${dmgType}` : "";
         dmgLine = `*Dano:* [[${finalFormula}]]${typeStr}`;
@@ -396,17 +501,17 @@ function generateSpellMacro() {
     el.value = `&{template:spell} {{character=@{${charRef}|character_name}}} {{spellname=${spName}}} {{type=${spType}}} {{execution=${spExec}}} {{duration=${spDur}}} {{range=${spRange}}} {{targetarea=${spTgt}}} ${resPart} {{description=${descFull}}} {{cd=[[@{${charRef}|cdtotal}]]}}`;
 }
 
-
-combatSkill = sanitize(val) || 'luta';
-// Atualiza o input de texto com o valor selecionado
-const inp = document.getElementById('combatSkillInput');
-if (inp) inp.value = val;
-// Destaca o botão ativo
-document.querySelectorAll('.combat-skill-btn').forEach(btn => {
-    btn.classList.toggle('active', sanitize(btn.dataset.skill) === combatSkill);
-});
-updateAll();
-
+function setCombatSkill(val) {
+    combatSkill = sanitize(val) || 'luta';
+    // Atualiza o input de texto com o valor selecionado
+    const inp = document.getElementById('combatSkillInput');
+    if (inp) inp.value = val;
+    // Destaca o botão ativo
+    document.querySelectorAll('.combat-skill-btn').forEach(btn => {
+        btn.classList.toggle('active', sanitize(btn.dataset.skill) === combatSkill);
+    });
+    updateAll();
+}
 
 function onCombatSkillInput(val) {
     combatSkill = sanitize(val) || 'luta';
